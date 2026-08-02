@@ -1,0 +1,29 @@
+{
+  "name": "infinity-space",
+  "version": "1.0.0",
+  "description": "Infinity Space - Multi Virtual Spaces with Cloud Storage",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "multer": "^1.4.5-lts.1",
+    "node-telegram-bot-api": "^0.66.0",
+    "uuid": "^11.0.5",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.3",
+    "fs-extra": "^11.2.0",
+    "mime-types": "^2.1.35"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": ["multi-space", "virtual-space", "cloud-storage"],
+  "author": "infinity1xr",
+  "license": "MIT"
+}
