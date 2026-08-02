@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Infinity Space</title>
+  <link rel="icon" href="/logo.jpg" type="image/jpeg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --card: #12121a;
+      --card2: #1a1a25;
+      --border: #2a2a3a;
+      --text: #e8e8f0;
+      --muted: #8888a0;
+      --accent: #4f8cff;
+      --accent2: #7b5cff;
+      --success: #2ecc71;
+      --danger: #ff4757;
+      --gradient: linear-gradient(135deg, #4f8cff, #7b5cff, #ff6b6b);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    /* Animated bg */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(79,140,255,0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(123,92,255,0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(255,107,107,0.05) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== LOGIN ===== */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+      padding: 20px;
+    }
+    .login-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+      text-align: center;
+      animation: fadeUp 0.6s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .logo-wrap {
+      width: 100px;
+      height: 80px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-wrap img {
+      max-width: 100%;
+      max-height: 100%;
+      filter: drop-shadow(0 4px 12px rgba(79,140,255,0.4));
+    }
+    .login-card h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+    .dev-tag {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 32px;
+      letter-spacing: 0.5px;
+    }
+    .form-group {
+      margin-bottom: 18px;
+      text-align: left;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79,140,255,0.2);
+    }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary {
+      background: var(--gradient);
+      color: white;
+      margin-top: 8px;
+    }
+    .btn-primary:hover { opacity: 0.95; }
+    .error-msg {
+      color: var(--danger);
+      font-size: 0.85rem;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    /* ===== APP ===== */
+    #app-screen { display: none; min-height: 100vh; position: relative; z-index: 1; }
+    
+    /* Top bar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      background: rgba(18,18,26,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .topbar-left img {
+      width: 36px;
+      height: 28px;
+      object-fit: contain;
+    }
+    .topbar-left h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .storage-badge {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .storage-badge .bar {
+      width: 60px;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .storage-badge .bar-fill {
+      height: 100%;
+      background: var(--gradient);
+      border-radius: 3px;
+      transition: width 0.3s;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .user-info {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .user-info strong { color: var(--text); }
+    .btn-sm {
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--card2);
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-sm:hover { background: var(--border); }
+    .btn-danger { border-color: var(--danger); color: var(--danger); }
+    .btn-danger:hover { background: rgba(255,71,87,0.15); }
+
+    /* Main layout */
+    .main {
+      display: flex;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+      gap: 24px;
+      min-height: calc(100vh - 70px);
+    }
+    .sidebar {
+      width: 260px;
+      flex-shrink: 0;
+    }
+    .content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .panel h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .device-id {
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      word-break: break-all;
+      background: var(--card2);
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+
+    .space-list { list-style: none; }
+    .space-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-bottom: 6px;
+      border: 1px solid transparent;
+    }
+    .space-item:hover { background: var(--card2); }
+    .space-item.active {
+      background: rgba(79,140,255,0.12);
+      border-color: rgba(79,140,255,0.3);
+    }
+    .space-item .name { font-weight: 500; font-size: 0.9rem; }
+    .space-item .meta { font-size: 0.75rem; color: var(--muted); }
+    .space-item .del {
+      opacity: 0;
+      color: var(--danger);
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+    .space-item:hover .del { opacity: 1; }
+    .space-item .del:hover { background: rgba(255,71,87,0.15); }
+
+    .add-space {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .add-space input {
+      flex: 1;
+      padding: 10px 12px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .add-space input:focus { border-color: var(--accent); }
+    .add-space button {
+      padding: 10px 14px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    /* Files area */
+    .files-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .files-header h3 { margin: 0; }
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+      padding: 40px 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      transition: border-color 0.2s, background 0.2s;
+      cursor: pointer;
+    }
+    .upload-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(79,140,255,0.08);
+    }
+    .upload-zone p { color: var(--muted); font-size: 0.9rem; }
+    .upload-zone strong { color: var(--accent); }
+
+    .files-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .file-card {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      transition: border-color 0.2s;
+    }
+    .file-card:hover { border-color: var(--accent); }
+    .file-card .icon {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
+    .file-card .fname {
+      font-size: 0.85rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+    .file-card .fmeta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .file-card .actions {
+      display: flex;
+      gap: 6px;
+    }
+    .file-card .actions button {
+      flex: 1;
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .file-card .actions button:hover { background: var(--border); }
+    .file-card .actions .del-btn { color: var(--danger); }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 14px 20px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      z-index: 999;
+      animation: fadeUp 0.3s ease;
+      max-width: 320px;
+      font-size: 0.9rem;
+    }
+    .toast.success { border-left: 4px solid var(--success); }
+    .toast.error { border-left: 4px solid var(--danger); }
+
+    @media (max-width: 768px) {
+      .main { flex-direction: column; padding: 16px; }
+      .sidebar { width: 100%; }
+      .topbar { padding: 12px 16px; }
+      .login-card { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- LOGIN -->
+  <div id="login-screen">
+    <div class="login-card">
+      <div class="logo-wrap">
+        <img src="/logo.jpg" alt="Infinity Space Logo">
+      </div>
+      <h1>Infinity Space</h1>
+      <div class="dev-tag">developer : infinity1xr</div>
+      
+      <form id="login-form">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="username" placeholder="Enter username" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Enter password" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Enter Space</button>
+        <div class="error-msg" id="login-error"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app-screen">
+    <div class="topbar">
+      <div class="topbar-left">
+        <img src="/logo.jpg" alt="Logo">
+        <h2>Infinity Space</h2>
+      </div>
+      <div class="storage-badge" id="storage-badge">
+        <span id="storage-text">0 / 0 MB</span>
+        <div class="bar"><div class="bar-fill" id="storage-bar" style="width:0%"></div></div>
+      </div>
+      <div class="topbar-right">
+        <div class="user-info">Hi, <strong id="user-name">—</strong></div>
+        <button class="btn-sm btn-danger" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="sidebar">
+        <div class="panel">
+          <h3>Your Spaces</h3>
+          <ul class="space-list" id="space-list"></ul>
+          <div class="add-space">
+            <input type="text" id="new-space-name" placeholder="New space name">
+            <button onclick="createSpace()">+</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Device Info</h3>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:4px;">Virtual Device ID</div>
+          <div class="device-id" id="device-id">—</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:10px;">
+            This ID is unique & isolated.<br>Not linked to your real device.
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="panel">
+          <div class="files-header">
+            <h3 id="current-space-title">Select a Space</h3>
+            <div>
+              <input type="file" id="file-input" multiple style="display:none" onchange="handleFiles(this.files)">
+              <button class="btn-sm" onclick="document.getElementById('file-input').click()">⬆ Upload Files</button>
+            </div>
+          </div>
+
+          <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+            <p>Drag & drop files here or <strong>click to browse</strong></p>
+            <p style="margin-top:6px;font-size:0.8rem;">Cloud storage • No device space used</p>
+          </div>
+
+          <div class="files-grid" id="files-grid">
+            <div class="empty-state">Select or create a space to manage files</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentUser = null;
+    let currentSpaceId = null;
+    let spaces = [];
+
+    // ===== Auth =====
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const errEl = document.getElementById('login-error');
+      errEl.textContent = '';
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Login failed');
+        
+        currentUser = data;
+        showApp();
+        loadMe();
+      } catch (err) {
+        errEl.textContent = err.message;
+      }
+    });
+
+    async function logout() {
+      await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+      currentUser = null;
+      currentSpaceId = null;
+      document.getElementById('app-screen').style.display = 'none';
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('password').value = '';
+    }
+
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/me', { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          currentUser = data;
+          showApp();
+          loadMe();
+        }
+      } catch (e) {}
+    }
+
+    function showApp() {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app-screen').style.display = 'block';
+      document.getElementById('user-name').textContent = currentUser.username;
+    }
+
+    // ===== Data =====
+    async function loadMe() {
+      try {
+        const res = await fetch('/api/me', { credentials: 'include' });
+        if (!res.ok) { logout(); return; }
+        const data = await res.json();
+        currentUser = data;
+        document.getElementById('user-name').textContent = data.username;
+        document.getElementById('device-id').textContent = data.deviceId;
+        updateStorage(data.usedMB, data.storageQuotaMB);
+        spaces = data.spaces || [];
+        renderSpaces();
+        if (spaces.length && !currentSpaceId) {
+          selectSpace(spaces[0].id);
+        } else if (currentSpaceId) {
+          loadFiles(currentSpaceId);
+        }
+      } catch (e) {
+        toast('Failed to load data', 'error');
+      }
+    }
+
+    function updateStorage(used, quota) {
+      document.getElementById('storage-text').textContent = `${used} / ${quota} MB`;
+      const pct = Math.min(100, (used / quota) * 100);
+      document.getElementById('storage-bar').style.width = pct + '%';
+    }
+
+    function renderSpaces() {
+      const list = document.getElementById('space-list');
+      list.innerHTML = spaces.map(s => `
+        <li class="space-item ${s.id === currentSpaceId ? 'active' : ''}" onclick="selectSpace('${s.id}')">
+          <div>
+            <div class="name">${escapeHtml(s.name)}</div>
+            <div class="meta">${s.fileCount || 0} files</div>
+          </div>
+          <button class="del" onclick="event.stopPropagation(); deleteSpace('${s.id}')" title="Delete">✕</button>
+        </li>
+      `).join('');
+    }
+
+    async function createSpace() {
+      const input = document.getElementById('new-space-name');
+      const name = input.value.trim();
+      if (!name) return;
+      try {
+        const res = await fetch('/api/spaces', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ name })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        input.value = '';
+        toast('Space created!', 'success');
+        loadMe();
+      } catch (e) {
+        toast(e.message, 'error');
+      }
+    }
+
+    async function deleteSpace(id) {
+      if (!confirm('Delete this space and all its files?')) return;
+      try {
+        const res = await fetch('/api/spaces/' + id, { method: 'DELETE', credentials: 'include' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        if (currentSpaceId === id) currentSpaceId = null;
+        toast('Space deleted', 'success');
+        loadMe();
+      } catch (e) {
+        toast(e.message, 'error');
+      }
+    }
+
+    function selectSpace(id) {
+      currentSpaceId = id;
+      const space = spaces.find(s => s.id === id);
+      document.getElementById('current-space-title').textContent = space ? space.name : 'Space';
+      renderSpaces();
+      loadFiles(id);
+    }
+
+    async function loadFiles(spaceId) {
+      const grid = document.getElementById('files-grid');
+      grid.innerHTML = '<div class="empty-state">Loading...</div>';
+      try {
+        const res = await fetch(`/api/spaces/${spaceId}/files`, { credentials: 'include' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        const files = data.files || [];
+        if (!files.length) {
+          grid.innerHTML = '<div class="empty-state">No files yet. Upload some!</div>';
+          return;
+        }
+        grid.innerHTML = files.map(f => `
+          <div class="file-card">
+            <div class="icon">${getFileIcon(f.mime || f.originalName)}</div>
+            <div class="fname" title="${escapeHtml(f.originalName)}">${escapeHtml(f.originalName)}</div>
+            <div class="fmeta">${formatSize(f.size)} • ${new Date(f.uploadedAt).toLocaleDateString()}</div>
+            <div class="actions">
+              <button onclick="downloadFile('${spaceId}','${f.id}','${escapeHtml(f.originalName)}')">Download</button>
+              <button class="del-btn" onclick="deleteFile('${spaceId}','${f.id}')">Delete</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        grid.innerHTML = `<div class="empty-state">${e.message}</div>`;
+      }
+    }
+
+    async function handleFiles(fileList) {
+      if (!currentSpaceId) {
+        toast('Select a space first', 'error');
+        return;
+      }
+      for (const file of fileList) {
+        const fd = new FormData();
+        fd.append('file', file);
+        try {
+          const res = await fetch(`/api/spaces/${currentSpaceId}/upload`, {
+            method: 'POST',
+            credentials: 'include',
+            body: fd
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error);
+          updateStorage(data.usedMB, currentUser.storageQuotaMB);
+          toast(`Uploaded: ${file.name}`, 'success');
+        } catch (e) {
+          toast(e.message, 'error');
+        }
+      }
+      loadFiles(currentSpaceId);
+      loadMe();
+    }
+
+    function downloadFile(spaceId, fileId, name) {
+      window.open(`/api/spaces/${spaceId}/files/${fileId}/download`, '_blank');
+    }
+
+    async function deleteFile(spaceId, fileId) {
+      if (!confirm('Delete this file?')) return;
+      try {
+        const res = await fetch(`/api/spaces/${spaceId}/files/${fileId}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        updateStorage(data.usedMB, currentUser.storageQuotaMB);
+        toast('File deleted', 'success');
+        loadFiles(spaceId);
+      } catch (e) {
+        toast(e.message, 'error');
+      }
+    }
+
+    // Drag & drop
+    const dropZone = document.getElementById('drop-zone');
+    ['dragenter', 'dragover'].forEach(ev => {
+      dropZone.addEventListener(ev, e => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+      });
+    });
+    ['dragleave', 'drop'].forEach(ev => {
+      dropZone.addEventListener(ev, e => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+      });
+    });
+    dropZone.addEventListener('drop', e => {
+      const files = e.dataTransfer.files;
+      if (files.length) handleFiles(files);
+    });
+
+    // Helpers
+    function escapeHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+      return (bytes/(1024*1024)).toFixed(1) + ' MB';
+    }
+    function getFileIcon(mimeOrName) {
+      const m = (mimeOrName || '').toLowerCase();
+      if (m.includes('image') || /\.(jpg|jpeg|png|gif|webp)$/.test(m)) return '🖼️';
+      if (m.includes('video') || /\.(mp4|mkv|webm)$/.test(m)) return '🎬';
+      if (m.includes('audio') || /\.(mp3|wav)$/.test(m)) return '🎵';
+      if (m.includes('pdf')) return '📄';
+      if (m.includes('zip') || m.includes('rar') || m.includes('7z')) return '📦';
+      if (m.includes('text') || /\.(txt|md|json)$/.test(m)) return '📝';
+      return '📁';
+    }
+    function toast(msg, type='success') {
+      const el = document.createElement('div');
+      el.className = 'toast ' + type;
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }
+
+    // Init
+    checkAuth();
+  </script>
+</body>
+</html>
